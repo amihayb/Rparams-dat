@@ -1,0 +1,300 @@
+/* ── CSS custom properties ────────────────────────────────────────────────── */
+:root {
+  --color-app-bg:              #f7faff;
+  --color-panel-bg:            #f7faff;
+  --color-nav-bg:              #ebf0f8;
+  --color-text-primary:        #344563;
+  --color-text-active:         #202124;
+  --color-text-muted:          #6c757d;
+  --color-btn-hover:           #c9dbf9;
+  --color-border:              #ccc;
+  --color-context-link:        #0066aa;
+  --color-primary:             #0066aa;
+  --color-error:               #dc3545;
+}
+
+[data-theme="dark"] {
+  --color-app-bg:              #0e1520;
+  --color-panel-bg:            #131d2e;
+  --color-nav-bg:              #1a2535;
+  --color-text-primary:        #c8d8f0;
+  --color-text-active:         #e0eeff;
+  --color-text-muted:          #5c6e8a;
+  --color-btn-hover:           #2c4168;
+  --color-border:              #1e2d44;
+  --color-context-link:        #4a6fa5;
+  --color-primary:             #4a6fa5;
+  --color-error:               #c0392b;
+}
+
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+body {
+  font-family: "Lato", "Consolas", "Courier New", monospace;
+  font-size: 13px;
+  background-color: var(--color-app-bg);
+  color: var(--color-text-primary);
+  padding-top: var(--topnav-h, 65px);   /* cleared dynamically by ResizeObserver */
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-bottom: 1rem;
+}
+
+/* ── Top navigation bar ───────────────────────────────────────────────────── */
+.topnav {
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: fixed;
+  background-color: var(--color-nav-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0.6rem 4px;
+  color: var(--color-text-primary);
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+/* logos row — always one line, left logo pinned left, right logo pinned right */
+.topnav-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+  min-height: 46px;
+}
+
+.topnav-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.03em;
+  text-align: center;
+  flex: 1 1 0;
+}
+
+/* controls row — wraps freely on narrow screens */
+.topnav-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.4rem;
+  padding-bottom: 4px;
+  width: 100%;
+}
+
+.raf-logo {
+  height: 46px;
+  padding: 4px 8px 4px 4px;
+  flex-shrink: 0;
+}
+
+/* file inputs, text inputs inside the topnav */
+.topnav label {
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  padding: 0 2px 0 8px;
+  flex-shrink: 0;
+}
+
+.topnav input[type="file"] {
+  font-size: 11px;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+
+.topnav input[type="text"] {
+  width: 10em;
+  font-family: inherit;
+  font-size: 12px;
+  background-color: var(--color-app-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.topnav input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* action buttons in the topnav */
+.topnav .nav-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.topnav .nav-btn:hover {
+  background-color: var(--color-btn-hover);
+  color: var(--color-text-active);
+}
+
+/* search field wrapper inside topnav */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.search-wrapper input[type="text"] {
+  width: 16em;
+  padding-left: 28px;   /* room for the icon */
+  font-family: inherit;
+  font-size: 12px;
+  background-color: var(--color-app-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 8px;
+}
+
+.search-wrapper input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.search-wrapper input[type="text"]::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* spacer that pushes the theme toggle to the right */
+.topnav .nav-spacer {
+  flex: 1 1 0;
+}
+
+/* theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-btn-hover);
+  color: var(--color-text-active);
+}
+
+/* Rafael / project logo on the far right */
+.head-img {
+  height: 36px;
+  padding: 4px 4px 4px 8px;
+  flex-shrink: 0;
+}
+
+/* ── Parameters table ─────────────────────────────────────────────────────── */
+#paramsTable {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+#paramsTable thead th {
+  background-color: var(--color-nav-bg);
+  color: var(--color-text-primary);
+  position: sticky;
+  top: var(--topnav-h, 65px);   /* tracks actual topnav height */
+  z-index: 1;
+}
+
+#paramsTable th,
+#paramsTable td {
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+#paramsTable tbody tr:hover td {
+  background-color: var(--color-btn-hover);
+}
+
+#paramsTable .path {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* value inputs inside table cells */
+.val-cell input[type="number"] {
+  width: 13em;
+  font-family: inherit;
+  font-size: 12px;
+  background-color: var(--color-app-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.val-cell input[type="text"] {
+  width: 28em;
+  font-family: inherit;
+  font-size: 12px;
+  background-color: var(--color-app-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.val-cell input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+#statusBar {
+  margin-top: 0.5rem;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  min-height: 1.4em;
+}
+
+#statusBar.error {
+  color: var(--color-error);
+}
+
+#statusBar code {
+  font-family: "Consolas", "Courier New", monospace;
+  background-color: var(--color-nav-bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
