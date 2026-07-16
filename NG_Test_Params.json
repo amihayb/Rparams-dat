@@ -5,6 +5,34 @@
   },
   "format": [
     {
+      "type": "uint8",
+      "path": ".ParametersVersionMajor",
+      "isJunk": false,
+      "dims": [
+        1,
+        1
+      ],
+      "units": "",
+      "value": 0
+    },
+    {
+      "type": "uint8",
+      "path": ".ParametersVersionMinor",
+      "isJunk": false,
+      "dims": [
+        1,
+        1
+      ],
+      "units": "",
+      "value": 1
+    },
+    {
+      "type": "uint8",
+      "path": "Junk3",
+      "isJunk": true,
+      "elemCount": 2
+    },
+    {
       "type": "single",
       "path": ".FilterParams.Num",
       "isJunk": false,
@@ -857,6 +885,12 @@
       "value": 0.079999998211860657
     },
     {
+      "type": "uint8",
+      "path": "Junk76",
+      "isJunk": true,
+      "elemCount": 4
+    },
+    {
       "type": "double",
       "path": ".KalmansParams.KalmanParam_EodTr.R_MsrVar",
       "isJunk": false,
@@ -913,7 +947,7 @@
     },
     {
       "type": "uint8",
-      "path": "Junk78",
+      "path": "Junk82",
       "isJunk": true,
       "elemCount": 7
     },
@@ -974,7 +1008,7 @@
     },
     {
       "type": "uint8",
-      "path": "Junk84",
+      "path": "Junk88",
       "isJunk": true,
       "elemCount": 7
     },
@@ -1035,7 +1069,7 @@
     },
     {
       "type": "uint8",
-      "path": "Junk90",
+      "path": "Junk94",
       "isJunk": true,
       "elemCount": 7
     },
@@ -1096,7 +1130,7 @@
     },
     {
       "type": "uint8",
-      "path": "Junk96",
+      "path": "Junk100",
       "isJunk": true,
       "elemCount": 7
     },
@@ -1157,7 +1191,7 @@
     },
     {
       "type": "uint8",
-      "path": "Junk102",
+      "path": "Junk106",
       "isJunk": true,
       "elemCount": 7
     }
