@@ -20,6 +20,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendor/font-awesome.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0066aa">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Params Editor">
 </head>
 <body>
     <div class="topnav" id="topnav">
@@ -51,6 +55,10 @@
             </div>
 
             <div class="nav-spacer"></div>
+
+            <button id="installBtn" class="theme-toggle" title="Install app" aria-label="Install app" style="display:none">
+                <i class="fa fa-arrow-circle-down"></i>
+            </button>
 
             <button class="theme-toggle" id="theme-toggle-btn" title="Toggle theme" aria-label="Toggle theme">
                 <i class="fa fa-moon-o" id="theme-icon"></i>
@@ -224,10 +232,11 @@
                 }
 
                 document.getElementById('outputName').value =
-                    file.name.replace(/\.json$/i, '');
+                    file.name.replace(/\.json$/i, '') + '_' + dateSuffix();
 
                 renderTable();
                 filterTable();
+                saveSchema(text, file.name.replace(/\.json$/i, '') + '_' + dateSuffix());
                 setStatus(
                     `Loaded: ${file.name}  ·  bus: ${parsed.meta.busName}` +
                     `  ·  pragma: ${parsed.meta.pragma}  ·  ${totalBytes(formatList)} bytes`
@@ -248,6 +257,7 @@
                 const loaded = readDat(buf, formatList);
                 Object.assign(currentValues, loaded);
                 updateTableValues();
+                saveValues();
                 setStatus(`Loaded .dat: ${file.name}  ·  ${buf.byteLength} bytes`);
             } catch (err) {
                 setStatus(`.dat read error: ${err.message}`, true);
@@ -266,6 +276,8 @@
         if (!name.endsWith('.dat')) name += '.dat';
 
         downloadBuffer(buffer, name);
+        saveValues();
+        localStorage.setItem(LS_OUTPUT, document.getElementById('outputName').value.trim() || 'params');
         setStatus(`Downloaded: ${name}  ·  ${bytes} bytes`);
     });
 
@@ -402,6 +414,14 @@
         });
     }
 
+    function dateSuffix() {
+        const d = new Date();
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = String(d.getFullYear()).slice(-2);
+        return dd + mm + yy;
+    }
+
     function downloadBuffer(buffer, filename) {
         const blob = new Blob([buffer], { type: 'application/octet-stream' });
         const url  = URL.createObjectURL(blob);
@@ -411,6 +431,62 @@
         a.click();
         URL.revokeObjectURL(url);
     }
+
+    // ── Persistence (localStorage) ──────────────────────────────────────────
+    const LS_SCHEMA = 'rparams-schema-json';
+    const LS_VALUES = 'rparams-saved-values';
+    const LS_OUTPUT = 'rparams-output-name';
+
+    function saveSchema(jsonText, outputName) {
+        try {
+            localStorage.setItem(LS_SCHEMA, jsonText);
+            localStorage.setItem(LS_OUTPUT, outputName);
+            localStorage.removeItem(LS_VALUES); // clear stale values for new schema
+        } catch (e) { /* storage quota – ignore */ }
+    }
+
+    function saveValues() {
+        if (!formatList) return;
+        try {
+            localStorage.setItem(LS_VALUES, JSON.stringify(currentValues));
+        } catch (e) { /* storage quota – ignore */ }
+    }
+
+    function restoreState() {
+        const schemaText = localStorage.getItem(LS_SCHEMA);
+        if (!schemaText) return;
+        try {
+            const parsed = JSON.parse(schemaText);
+            if (!parsed.meta || !Array.isArray(parsed.format)) return;
+
+            formatList    = resolveOffsets(parsed.format);
+            currentValues = {};
+            for (const entry of formatList) {
+                if (!entry.isJunk) currentValues[entry.path] = entry.value;
+            }
+
+            const savedText = localStorage.getItem(LS_VALUES);
+            if (savedText) {
+                try { Object.assign(currentValues, JSON.parse(savedText)); }
+                catch (e) { /* corrupt – ignore */ }
+            }
+
+            const savedOutput = localStorage.getItem(LS_OUTPUT);
+            if (savedOutput) document.getElementById('outputName').value = savedOutput;
+
+            renderTable();
+            filterTable();
+            setStatus(
+                `Restored: bus: ${parsed.meta.busName}` +
+                `  ·  pragma: ${parsed.meta.pragma}  ·  ${totalBytes(formatList)} bytes`
+            );
+        } catch (e) {
+            localStorage.removeItem(LS_SCHEMA);
+            localStorage.removeItem(LS_VALUES);
+        }
+    }
+
+    restoreState();
 
     // ── Parameter filter ────────────────────────────────────────────────────
     function filterTable() {
@@ -459,6 +535,40 @@
             applyTheme(next);
         });
     })();
+
+    // ── PWA install prompt ───────────────────────────────────────────────────
+    (function () {
+        let deferred = null;
+        const btn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferred = e;
+            btn.style.display = '';
+        });
+
+        btn.addEventListener('click', async () => {
+            if (!deferred) return;
+            deferred.prompt();
+            const { outcome } = await deferred.userChoice;
+            if (outcome === 'accepted') {
+                btn.style.display = 'none';
+                deferred = null;
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            btn.style.display = 'none';
+            deferred = null;
+        });
+    })();
+
+    // ── Service Worker ───────────────────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+    }
     </script>
 </body>
 </html>

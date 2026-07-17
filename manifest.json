@@ -1,0 +1,17 @@
+{
+  "name": ".dat Parameter File Editor",
+  "short_name": "Params Editor",
+  "description": "Edit and generate binary .dat parameter files from a JSON schema",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7faff",
+  "theme_color": "#0066aa",
+  "icons": [
+    {
+      "src": "images/logo-title.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
